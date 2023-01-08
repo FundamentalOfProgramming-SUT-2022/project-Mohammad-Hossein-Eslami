@@ -1,0 +1,46 @@
+
+#include <stdio.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <sys/types.h>
+
+
+int main(){
+    char dastor [30];
+    char file[] = "besaz--file";
+    char exit[] = "exit";
+    int counter = 0;
+    FILE * fptr;
+    while(1){
+    scanf("%s", dastor);
+    if(!strcmp(dastor, file)){
+                scanf(" /");
+                char c;
+                char folder[50];
+                scanf("%s", folder);
+                char *folder2 = (char*)malloc(50); 
+                char *folder1 = strtok(folder, "/");
+                while (folder1 != NULL){
+                    mkdir(folder1);
+                    chdir(folder1);
+                    counter++;
+                    folder2 = folder1;
+                    folder1 = strtok(NULL, "/");
+                }
+                chdir("..");
+                rmdir(folder2);
+                fptr = fopen(folder2, "w");
+                for (int i = counter; i > 1; i--){
+                    chdir("..");
+                }
+                counter = 0;
+        } else if (!strcmp(dastor, exit)){
+            break;
+        } else {
+            printf("Sorry Bro, Invalid command");
+        }
+    }
+}
