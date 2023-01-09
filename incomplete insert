@@ -1,0 +1,229 @@
+//FOP-Project
+// Mohammad Hossein Eslami 
+
+#include <stdio.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <dirent.h> 
+#include <sys/types.h>
+#define MAX_LINE_LENGTH 1000
+
+int main(){
+    char dastor [30];
+    char file[] = "besaz--file";
+    char cat[] = "bekhun--file";
+    char exit[] = "exit";
+    char insert[] = "beriz--str--file";
+    int counter = 0;
+    int counter1 = 0;
+    FILE * fptr;
+    while(1){
+    scanf("%s", dastor);   
+    if(!strcmp(dastor, file)){
+                char c;
+                scanf(" ");
+                scanf("%c", &c); //Next line is to seperate the different ways to receive a command
+                if (c == '/'){
+                    char folder[50];
+                    scanf("%s", folder);
+                    char *folder2 = (char*)malloc(50); 
+                    char *folder1 = strtok(folder, "/");
+                    while (folder1 != NULL){
+                        mkdir(folder1);
+                        chdir(folder1);
+                        counter++;
+                        folder2 = folder1;
+                        folder1 = strtok(NULL, "/");
+                    }
+                    chdir(".."); //Goes back to delete the directory and make a file with the same name
+                    rmdir(folder2);
+                    fptr = fopen(folder2, "w");
+
+                    fclose(fptr);
+                    for (int i = counter; i > 1; i--){
+                        chdir("..");
+                    }
+                    counter = 0;
+                } else if ( c == '"'){
+                    char folder[100];
+                    char a;
+                    gets(folder);
+                    for (int i=0;;i++){ //This for is made to ignore the '"' mark at the end of the string
+                        a=folder[i];
+                        if(a=='\0'){
+                            folder[i-1] = '\0';
+                            break;
+                        }
+                    }
+                    char *folder2 = (char*)malloc(50); 
+                    char *folder1 = strtok(folder, "/");
+                    while (folder1 != NULL){
+                        mkdir(folder1);
+                        chdir(folder1);
+                        counter++;
+                        folder2 = folder1;
+                        folder1 = strtok(NULL, "/");
+                    }
+                    chdir("..");
+                    rmdir(folder2);
+    
+                    fptr = fopen(folder2, "w");
+                    for (int i = counter; i > 1; i--){
+                        chdir("..");
+                    }
+                    counter = 0;
+                }
+        } else if (!strcmp(dastor, exit)){
+            break;
+        } else if (!strcmp(dastor, cat)){
+                char c;
+                scanf(" ");
+                scanf("%c", &c); //Next line is to seperate the different ways to receive a command
+                if (c == '/'){
+                    char folder[50];
+                    scanf("%s", folder);
+                    char *folder2 = (char*)malloc(50); 
+                    char *folder1 = strtok(folder, "/");
+                    while (folder1 != NULL){
+                        chdir(folder1);
+                        counter1++;
+                        folder2 = folder1;
+                        folder1 = strtok(NULL, "/");
+                    }
+                    fptr = fopen(folder2, "r");
+                    if (fptr == NULL){
+                        printf("File does not exist\n");
+                        for (int i = counter1; i > 1; i--){
+                            chdir("..");
+                        }
+                        counter1 = 0;
+                    } else {
+                        char ch;
+                        ch = fgetc(fptr);
+                        while( ch != EOF){
+                            printf("%c", ch);
+                            ch = fgetc(fptr);
+                        }
+                        printf("\n");
+                        for (int i = counter1; i > 1; i--){
+                            chdir("..");
+                        }
+                    }
+                    fclose(fptr);
+                    counter1 = 0;
+                } else if (c == '"'){
+                    char folder[100];
+                    char a;
+                    gets(folder);
+                    for (int i=0;;i++){ //This for is made to ignore the '"' mark at the end of the string
+                        a=folder[i];
+                        if(a=='\0'){
+                            folder[i-1] = '\0';
+                            break;
+                        }
+                    }
+                    char *folder2 = (char*)malloc(50); 
+                    char *folder1 = strtok(folder, "/");
+                    while (folder1 != NULL){
+                        chdir(folder1);
+                        counter1++;
+                        folder2 = folder1;
+                        folder1 = strtok(NULL, "/");
+                    }
+                    fptr = fopen(folder2, "r");
+                    if (fptr == NULL){
+                        printf("File does not exist\n");
+                        for (int i = counter1; i > 1; i--){
+                            chdir("..");
+                        }
+                        counter1 = 0;
+                    } else {
+                        char ch;
+                        ch = fgetc(fptr);
+                        while( ch != EOF){
+                            printf("%c", ch);
+                            ch = fgetc(fptr);
+                        }
+                        printf("\n");
+                        for (int i = counter1; i > 1; i--){
+                            chdir("..");
+                        }
+                    }
+                    fclose(fptr);
+                    counter1 = 0;
+                }
+        } else if (!strcmp(dastor, insert)){
+                int counter3;
+                char folder[50];
+                scanf("%s", folder);
+                char *folder2 = (char*)malloc(50); 
+                char *folder1 = strtok(folder, "/");
+                while (folder1 != NULL){
+                    chdir(folder1);
+                    counter3++;
+                    folder2 = folder1;
+                    folder1 = strtok(NULL, "/");
+                }
+                
+                scanf(" --str ");
+                char c1;
+                char *message = (char*)malloc(100*sizeof(char));
+                c1 = getchar();
+                message[0] = c1;
+                int counter2 = 1;
+                while(1){
+                    c1 = 0;
+                    c1 = getchar();
+                    *(message+counter2) = c1;
+                    counter2++;
+                    if( c1 == '-'){
+                        break;
+                    }
+                }
+                scanf("-pos ");
+                int line;
+                int pos;
+                scanf("%d:%d", &line, &pos);
+                message[counter2] = '\0';
+                message[counter2-1] = '\0';
+                char c2;
+                int counter4 = 0;
+                fptr = fopen(folder2, "a");
+                c2 = fgetc(fptr);
+                if ( c2 == EOF){
+                    for (int i = 1; i < line; i++){
+                        fprintf(fptr, "\n");
+                    }
+                    for (int i = 0; i < pos; i++){
+                        fprintf(fptr, " ");
+                    }
+                    for(int i = 0; i < strlen(message); i++){
+                        if (message[i] == '\\'){
+                            counter4++;
+                            if (message[i+1] == 'n' && counter4 == 1){
+                                fprintf(fptr, "\n");
+                                i++;
+                                counter4 = 0;
+                            }
+                        } else {
+                            fprintf(fptr, "%c", message[i]);
+                        }
+                    }
+                }
+                fclose(fptr);
+        } else {
+            char c; //All of this is made in order to print only one "invalid command"
+            scanf("%c", &c);
+            if (c == '\n'){
+                goto x;
+            }
+            while(c!='\n')
+                scanf("%c", &c);
+            x:
+            printf("Invalid input\n");
+            c=0;
+        }
+    }
+}
