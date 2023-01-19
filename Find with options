@@ -1,0 +1,1191 @@
+//FOP-Project
+// Mohammad Hossein Eslami 
+
+#include <stdio.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <dirent.h> 
+#include <sys/types.h>
+#include <math.h>
+#define MAX_LINE_LENGTH 1000
+char clipboard[10000];
+int counterclipboard = 0;
+void createfile(){
+    int counter = 0; //This counter is used to get out of dir in creafile
+    FILE * fptr;
+    char c;
+    scanf(" ");
+    scanf("%c", &c); //Next line is to seperate the different ways to receive a command
+    if (c == '/'){
+        char folder[50];
+        scanf("%s", folder);
+        char *folder2 = (char*)malloc(50); 
+        char *folder1 = strtok(folder, "/");
+        while (folder1 != NULL){
+            mkdir(folder1);
+            chdir(folder1);
+            counter++;
+            folder2 = folder1;
+            folder1 = strtok(NULL, "/");
+         }
+        chdir(".."); //Goes back to delete the directory and make a file with the same name
+        rmdir(folder2);
+        fptr = fopen(folder2, "w");
+        fclose(fptr);
+        for (int i = counter; i > 1; i--){
+            chdir("..");
+        }
+         counter = 0;
+    } else if ( c == '"'){
+        char folder[100];
+        char a;
+        gets(folder);
+        for (int i=0;;i++){ //This for is made to ignore the '"' mark at the end of the string
+            a=folder[i];
+            if(a=='\0'){
+                folder[i-1] = '\0';
+                break;
+            }
+        }
+        char *folder2 = (char*)malloc(50); 
+        char *folder1 = strtok(folder, "/");
+        while (folder1 != NULL){
+            mkdir(folder1);
+            chdir(folder1);
+            counter++;
+            folder2 = folder1;
+            folder1 = strtok(NULL, "/");
+        }
+            chdir("..");
+            rmdir(folder2);
+            fptr = fopen(folder2, "w");
+            fclose(fptr);
+            for (int i = counter; i > 1; i--){
+                chdir("..");
+            }
+            counter = 0;
+    }
+}
+
+void catfile(){
+    int counter1 = 0;
+    FILE *fptr;
+    char c;
+                scanf(" ");
+                scanf("%c", &c); //Next line is to seperate the different ways to receive a command
+                if (c == '/'){
+                    char folder[50];
+                    scanf("%s", folder);
+                    char *folder2 = (char*)malloc(50); 
+                    char *folder1 = strtok(folder, "/");
+                    while (folder1 != NULL){
+                        chdir(folder1);
+                        counter1++;
+                        folder2 = folder1;
+                        folder1 = strtok(NULL, "/");
+                    }
+                    fptr = fopen(folder2, "r");
+                    if (fptr == NULL){
+                        printf("File does not exist\n");
+                        for (int i = counter1; i > 1; i--){
+                            chdir("..");
+                        }
+                        counter1 = 0;
+                    } else {
+                        char ch;
+                        ch = fgetc(fptr);
+                        while( ch != EOF){
+                            printf("%c", ch);
+                            ch = fgetc(fptr);
+                        }
+                        printf("\n");
+                        for (int i = counter1; i > 1; i--){
+                            chdir("..");
+                        }
+                    }
+                    fclose(fptr);
+                    counter1 = 0;
+                } else if (c == '"'){
+                    char folder[100];
+                    char a;
+                    gets(folder);
+                    for (int i=0;;i++){ //This for is made to ignore the '"' mark at the end of the string
+                        a=folder[i];
+                        if(a=='\0'){
+                            folder[i-1] = '\0';
+                            break;
+                        }
+                    }
+                    char *folder2 = (char*)malloc(50); 
+                    char *folder1 = strtok(folder, "/");
+                    while (folder1 != NULL){
+                        chdir(folder1);
+                        counter1++;
+                        folder2 = folder1;
+                        folder1 = strtok(NULL, "/");
+                    }
+                    fptr = fopen(folder2, "r");
+                    if (fptr == NULL){
+                        printf("File does not exist\n");
+                        for (int i = counter1; i > 1; i--){
+                            chdir("..");
+                        }
+                        counter1 = 0;
+                    } else {
+                        char ch;
+                        ch = fgetc(fptr);
+                        while( ch != EOF){
+                            printf("%c", ch);
+                            ch = fgetc(fptr);
+                        }
+                        printf("\n");
+                        for (int i = counter1; i > 1; i--){
+                            chdir("..");
+                        }
+                    }
+                    fclose(fptr);
+                    counter1 = 0;
+        }
+}  
+
+void removestr(){
+    FILE *fptr;
+    int counter = 0;
+    char c;
+    scanf(" ");
+    scanf("%c", &c); //Next line is to seperate the different ways to receive a command
+    char folder[50];
+    scanf("%s", folder);
+    char *folder2 = (char*)malloc(50); 
+    char *folder1 = strtok(folder, "/");
+    while (folder1 != NULL){
+        chdir(folder1);
+        counter++;
+        folder2 = folder1;
+        folder1 = strtok(NULL, "/");
+    }
+    scanf(" --pos");
+    int line, pos;
+    scanf("%d:%d", &line, &pos);
+    scanf("--size");
+    int size;
+    char posi;
+    scanf("%d-%c", &size, &posi);
+    char *infoFile = (char *)malloc(10000*sizeof(char));
+    if ((fptr = fopen(folder2, "rb")) == NULL){                //This part is made to see what is inside the file
+        printf("File does not exist\n");
+        for (int i = counter; i > 1; i--){
+            chdir("..");
+        }
+        return;    
+    } else {
+        char ch2; //This copies the data inside the file
+        int i = 0;
+        ch2 = fgetc(fptr);
+        infoFile[0] = ch2;
+        while(ch2 != EOF){
+            i++;
+            ch2 = fgetc(fptr);
+            infoFile[i] = ch2;
+        }
+        infoFile[i] = '\0';
+    }
+    fclose(fptr);
+    int flag1 = 1; 
+    int place;
+    for (int i = 0; i < strlen(infoFile); i++){ //This is to find the position of the line we are trying to get to
+        if (infoFile[i] == '\n'){
+            flag1++;
+        }
+        if (flag1 == line){
+            place = i;
+            break;
+        }
+    }
+    if (line == 1){ //This one is done to make sure that if the line is one, we don't add the \n which does not exist
+        place -= 1;
+    }
+    if(posi == 'b'){
+        for (int i = pos+place+1-size+1; i <= pos+place+1; i++){  //This is to check for \r
+            if (infoFile[i] == '\r'){
+                size += 1;
+            }
+        }
+        for (int i = pos+place+1-size+1; i < strlen(infoFile); i++){
+            infoFile[i] = infoFile[i+size];
+        }
+    } else if (posi == 'f'){
+        for (int i = pos+place+1; i <= pos+place+1+size-1; i++){    //This is to check for \r
+            size += 1;
+        }
+        for(int i = pos+place+1; i < strlen(infoFile); i++){
+            infoFile[i] = infoFile[i+size];
+        }
+    }
+    fptr = fopen(folder2, "wb"); //reopens the file but empties it and fills it again
+    for(int i = 0; i < strlen(infoFile); i++){
+        fprintf(fptr, "%c", infoFile[i]);
+    }
+    fclose(fptr);
+    for(int i = counter; i > 1; i--){
+        chdir("..");
+    }
+    return;
+}
+
+void copystr(){
+    FILE *fptr;
+    int counter = 0;
+    char c;
+    scanf(" ");
+    scanf("%c", &c); //Next line is to seperate the different ways to receive a command
+    char folder[50];
+    scanf("%s", folder);
+    char *folder2 = (char*)malloc(50); 
+    char *folder1 = strtok(folder, "/");
+    while (folder1 != NULL){
+        chdir(folder1);
+        counter++;
+        folder2 = folder1;
+        folder1 = strtok(NULL, "/");
+    }
+    scanf(" --pos");
+    int line, pos;
+    scanf("%d:%d", &line, &pos);
+    scanf("--size");
+    int size;
+    char posi;
+    scanf("%d-%c", &size, &posi);
+    char *infoFile = (char *)malloc(10000*sizeof(char));
+    if ((fptr = fopen(folder2, "rb")) == NULL){                //This part is made to see what is inside the file
+        printf("File does not exist\n");
+        for (int i = counter; i > 1; i--){
+            chdir("..");
+        }
+        return;    
+    } else {
+        char ch2; //This copies the data inside the file
+        int i = 0;
+        ch2 = fgetc(fptr);
+        infoFile[0] = ch2;
+        while(ch2 != EOF){
+            i++;
+            ch2 = fgetc(fptr);
+            infoFile[i] = ch2;
+        }
+        infoFile[i] = '\0';
+    }
+    fclose(fptr);
+    int flag1 = 1; 
+    int place;
+    for (int i = 0; i < strlen(infoFile); i++){ //This is to find the position of the line we are trying to get to
+        if (infoFile[i] == '\n'){
+            flag1++;
+        }
+        if (flag1 == line){
+            place = i;
+            break;
+        }
+    }
+    if (line == 1){ //This one is done to make sure that if the line is one, we don't add the \n which does not exist
+        place -= 1;
+    }
+    if(posi == 'b'){
+        for (int i = pos+place+1-size+1; i <= pos+place; i++){    //This is to check for \r
+            if (infoFile[i] == '\r'){
+                size += 1;
+            }
+        }
+        for (int i = pos+place+1-size+1; i <= pos+place+1; i++){
+            clipboard[counterclipboard] = infoFile[i];
+            counterclipboard++;
+        }
+    } else if (posi == 'f'){
+        for (int i = pos+place+1; i <= pos+place+1+size-1;i++){    //This is to check for \r
+            if (infoFile[i] == '\r'){
+                size += 1;
+            }
+        }
+        for (int i = pos+place+1; i <= pos+place+1+size-1; i++){
+            clipboard[counterclipboard] = infoFile[i];
+            counterclipboard++;
+        }
+    }
+    for (int i  = counter; i > 1; i--){
+        chdir("..");
+    }
+    counter = 0;
+    return;
+}
+
+void cutstr(){
+    FILE *fptr;
+    int counter = 0;
+    char c;
+    scanf(" ");
+    scanf("%c", &c); //Next line is to seperate the different ways to receive a command
+    char folder[50];
+    scanf("%s", folder);
+    char *folder2 = (char*)malloc(50); 
+    char *folder1 = strtok(folder, "/");
+    while (folder1 != NULL){
+        chdir(folder1);
+        counter++;
+        folder2 = folder1;
+        folder1 = strtok(NULL, "/");
+    }
+    scanf(" --pos");
+    int line, pos;
+    scanf("%d:%d", &line, &pos);
+    scanf("--size");
+    int size;
+    char posi;
+    scanf("%d-%c", &size, &posi);
+    char *infoFile = (char *)malloc(10000*sizeof(char));
+    if ((fptr = fopen(folder2, "rb")) == NULL){                //This part is made to see what is inside the file
+        printf("File does not exist\n");
+        for (int i = counter; i > 1; i--){
+            chdir("..");
+        }
+        return;    
+    } else {
+        char ch2; //This copies the data inside the file
+        int i = 0;
+        ch2 = fgetc(fptr);
+        infoFile[0] = ch2;
+        while(ch2 != EOF){
+            i++;
+            ch2 = fgetc(fptr);
+            infoFile[i] = ch2;
+        }
+        infoFile[i] = '\0';
+    }
+    fclose(fptr);
+    int flag1 = 1; 
+    int place;
+    for (int i = 0; i < strlen(infoFile); i++){ //This is to find the position of the line we are trying to get to
+        if (infoFile[i] == '\n'){
+            flag1++;
+        }
+        if (flag1 == line){
+            place = i;
+            break;
+        }
+    }
+    if (line == 1){ //This one is done to make sure that if the line is one, we don't add the \n which does not exist
+        place -= 1;
+    }
+    if(posi == 'b'){
+        for (int i = pos+place+1-size+1; i <= pos+place; i++){    //This is to check for \r
+            if (infoFile[i] == '\r'){
+                size += 1;
+            }
+        }
+        for (int i = pos+place+1-size+1; i <= pos+place+1; i++){
+            clipboard[counterclipboard] = infoFile[i];
+            counterclipboard++;
+        }
+    } else if (posi == 'f'){
+        for (int i = pos+place+1; i <= pos+place+1+size-1;i++){    //This is to check for \r
+            if (infoFile[i] == '\r'){
+                size += 1;
+            }
+        }
+        for (int i = pos+place+1; i <= pos+place+1+size-1; i++){
+            clipboard[counterclipboard] = infoFile[i];
+            counterclipboard++;
+        }
+    }
+    if(posi == 'b'){
+        for (int i = pos+place+1-size+1; i <= pos+place+1; i++){  //This is to check for \r
+            if (infoFile[i] == '\r'){
+                size += 1;
+            }
+        }
+        for (int i = pos+place+1-size+1; i < strlen(infoFile); i++){
+            infoFile[i] = infoFile[i+size];
+        }
+    } else if (posi == 'f'){
+        for (int i = pos+place+1; i <= pos+place+1+size-1; i++){    //This is to check for \r
+            size += 1;
+        }
+        for(int i = pos+place+1; i < strlen(infoFile); i++){
+            infoFile[i] = infoFile[i+size];
+        }
+    }
+    fptr = fopen(folder2, "wb"); //reopens the file but empties it and fills it again
+    for(int i = 0; i < strlen(infoFile); i++){
+        fprintf(fptr, "%c", infoFile[i]);
+    }
+    fclose(fptr);
+    for(int i = counter; i > 1; i--){
+        chdir("..");
+    }
+    counter = 0;
+    return;
+}
+
+
+void pastestr(){
+    int counter4 = 0;
+    int couunter11 = 0;
+    FILE *fptr;
+    int counter = 0;
+    char c;
+    scanf(" ");
+    scanf("%c", &c); //Next line is to seperate the different ways to receive a command
+    char folder[50];
+    scanf("%s", folder);
+    char *folder2 = (char*)malloc(50); 
+    char *folder1 = strtok(folder, "/");
+    while (folder1 != NULL){
+        chdir(folder1);
+        counter++;
+        folder2 = folder1;
+        folder1 = strtok(NULL, "/");
+    }
+    scanf(" --pos");
+    int line, pos;
+    scanf("%d:%d", &line, &pos);
+    char *infoFile = (char *)malloc(10000*sizeof(char));
+    if ((fptr = fopen(folder2, "rb")) == NULL){                //This part is made to see what is inside the file
+        printf("File does not exist\n");
+        for (int i = counter; i > 1; i--){
+            chdir("..");
+        }
+        fclose(fptr);
+        return;    
+    } else {
+        char ch2; //This copies the data inside the file
+        int i = 0;
+        ch2 = fgetc(fptr);
+        infoFile[0] = ch2;
+        while(ch2 != EOF){
+            i++;
+            ch2 = fgetc(fptr);
+            infoFile[i] = ch2;
+        }
+        infoFile[i+1] = '\0';
+    }
+    fclose(fptr);
+    fptr = fopen(folder2, "rb+");
+    if (fptr == NULL){ //This checks if the file exists
+        printf("File does not exist\n");
+        for (int i = counter; i > 1; i--){
+            chdir("..");
+        }
+        counter = 0;
+        return;
+    } else {  
+    fseek(fptr, 0, SEEK_END);     
+    int size;
+    size = ftell(fptr);
+    if ( size == 0){ //This is used to check if the file empty, then start the command
+        for (int i = 1; i < line; i++){
+            fprintf(fptr, "\n");
+        }
+        for (int i = 0; i < pos; i++){
+            fprintf(fptr, " ");
+        }
+        for(int i = 0; i < strlen(clipboard); i++){ //Here we are checking for \n and \\n
+            if (clipboard[i] == '\\'){
+                counter4++;
+                if (clipboard[i+1] == 'n' && counter4 == 1){
+                    fprintf(fptr, "\n");
+                    i++;
+                    counter4 = 0;
+                }
+                fprintf(fptr, "%c", clipboard[i+1]);
+                    i++;
+                } else {
+                    fprintf(fptr, "%c", clipboard[i]);
+                }
+        }
+         } else {
+            int flag = 1; //This is to see how many \n are in the file
+            for (int i = 0; i < strlen(infoFile); i++){
+                if (infoFile[i] == '\n'){
+                    flag++;
+                }
+            }
+            if (flag < line){ //This part checkes if the given position is below everything already in the file
+                int diff = line - flag;
+                for (int i = 1; i <= diff; i++){
+                    fprintf(fptr, "\n");
+                }
+                for (int i = 0; i < pos; i++){
+                    fprintf(fptr, " ");
+                }
+                int counter5 = 0; //This counter is used for \n and \\n
+                for(int i = 0; i < strlen(clipboard); i++){ //Here we are checking for \n and \\n
+                    if (clipboard[i] == '\\'){
+                        counter5++;
+                        if (clipboard[i+1] == 'n' && counter5 == 1){
+                            fprintf(fptr, "\n");
+                            i++;
+                            counter5 = 0;
+                        }
+                        fprintf(fptr, "%c", clipboard[i+1]);
+                        i++;
+                    } else {
+                        fprintf(fptr, "%c", clipboard[i]);
+                    }
+                }
+            } else {
+                int flag1 = 1;
+                int place;
+                for (int i = 0; i < strlen(infoFile); i++){ //This is to find the position of the line we are trying to get to
+                    if (infoFile[i] == '\n'){
+                    flag1++;
+                }
+                    if (flag1 == line){
+                    place = i;
+                    break;
+                    }
+                }
+                if (line == 1){ //This one is done to make sure that if the line is one, it is not added up to the position
+                    line = 0;
+                }
+                fseek(fptr, place+pos+1, SEEK_SET);
+                int counter6 = 0; //This coutner is used to check for \n and \\n
+                for(int i = 0; i < strlen(clipboard); i++){ //Here we are checking for \n and \\n
+                    if (clipboard[i] == '\\'){
+                    counter6++;
+                    if (clipboard[i+1] == 'n' && counter6 == 1){
+                        fputs("\n", fptr);
+                        i++;
+                        counter6 = 0;
+                    }
+                        fprintf(fptr, "%c", clipboard[i+1]);
+                        i++;
+                    } else {
+                        fprintf(fptr, "%c", clipboard[i]);
+                    }
+                }
+                for (int i = pos+place+1; i < strlen(infoFile)-1; i++){
+                    fprintf(fptr, "%c", infoFile[i]);
+                }              
+            }
+            }
+            fclose(fptr);
+            for (int i = counter; i > 1; i--){
+                chdir("..");
+            }
+            counter = 0;
+    }
+
+
+}
+
+void bywordstr(char message[100], char infoFile[10000]){
+    char *pos = strstr(infoFile, message);
+    int flag = 0;
+    for (int i = 0; i < (pos-infoFile); i++){
+        if (infoFile[i] == ' ' || infoFile[i] == '\n'){
+            flag++;
+        }
+    }
+    if (flag == 0){
+        printf("-1\n");
+        return;
+    }
+    printf("%d\n", flag+1);
+}
+
+
+void countstr(char message[100], char infoFile[10000]){ // This site really helped, https://www.javatpoint.com/find-occurrence-of-substring-in-c-using-function
+    int l1, l2, j;
+    int count = 0;
+    int count1 = 0;
+    l1 = strlen(message);
+    l2 = strlen(infoFile);
+    for (int i = 0; i <= l2; i++){
+        j = 0;
+        while(infoFile[i] == message[j]){
+            count++;
+            i++;
+            j++;
+        }
+
+        if (count == l1){
+            count1++;
+            count = 0;
+        } else {
+            count = 0;
+        }
+    }
+    printf("%d\n", count1);
+}
+
+void allstr(char message[100], char infoFile[10000]){
+    int l1, l2, j;
+    int count = 0;
+    int words = 1;
+    int saver[100];
+    int savercounter = 0;
+    l1 = strlen(message);
+    l2 = strlen(infoFile);
+    for (int i = 0; i <= l2; i++){
+        j = 0;
+        while(infoFile[i] == message[j]){
+            count++;
+            i++;
+            j++;
+        }
+
+        if (count == l1){
+            for (int j = 0; j <= i-l1; j++){
+                if (infoFile[j] == ' ' || infoFile[j] == '\n'){
+                    words++;
+                }
+            }
+            saver[savercounter] = words;
+            savercounter++;
+            words = 1;
+            count = 0;
+        } else {
+            count = 0;
+        }
+    }
+    if (savercounter == 0){
+        printf("-1\n");
+        return;
+    }
+    for (int i = 0; i < savercounter; i++){
+        printf("%d, ", saver[i]);
+    }
+    printf("\n");
+}
+
+void atstr(char message[100], char infoFile[10000], int num){
+    int l1, l2, j;
+    int count = 0;
+    int saver[100];
+    int savercounter = 0;
+    l1 = strlen(message);
+    l2 = strlen(infoFile);
+    for (int i = 0; i <= l2; i++){
+        j = 0;
+        while(infoFile[i] == message[j]){
+            count++;
+            i++;
+            j++;
+        }
+
+        if (count == l1){
+            saver[savercounter] = i-l1;
+            savercounter++;
+            count = 0;
+        } else {
+            count = 0;
+        }
+    }
+    if (savercounter == 0){
+        printf("-1\n");
+        return;
+    }
+    if (num > savercounter){
+        printf("-1\n");
+        return;
+    } else {
+        printf("%d\n", saver[num-1]);
+        return;
+    }
+}
+
+void atbywordstr(char message[100], char infoFile[10000], int num){
+    int l1, l2, j;
+    int count = 0;
+    int words = 1;
+    int saver[100];
+    int savercounter = 0;
+    l1 = strlen(message);
+    l2 = strlen(infoFile);
+    for (int i = 0; i <= l2; i++){
+        j = 0;
+        while(infoFile[i] == message[j]){
+            count++;
+            i++;
+            j++;
+        }
+
+        if (count == l1){
+            saver[savercounter] = i-l1;
+            savercounter++;
+            count = 0;
+        } else {
+            count = 0;
+        }
+    }
+    if (savercounter == 0){
+        printf("-1\n");
+        return;
+    }
+    if (num > savercounter){
+        printf("-1\n");
+        return;
+    } else {
+        for (int i = 0; i < saver[num-1]; i++){
+            if (infoFile[i] == ' ' || infoFile[i] == '\n'){
+                words++;
+            }
+        }
+        printf("%d\n", words);
+        return;
+    }
+}
+
+void findstr(){
+    int counter = 0;
+    FILE *fptr;
+    char c;
+    scanf(" ");
+    char c1;
+    char *message = (char*)malloc(100*sizeof(char));
+    c1 = getchar();
+    message[0] = c1; //This is to get the string that we want to insert
+    int counter2 = 1; //This counter is used to get command
+    while(1){
+        c1 = 0;
+        c1 = getchar();
+        *(message+counter2) = c1;
+        counter2++;
+        if( c1 == '-'){
+        break;
+        }
+    }
+    message[counter2] = '\0'; //This is to ignore the '-' and ' ' at the end of the message
+    message[counter2-1] = '\0';
+    for (int i = 0; i < strlen(message); i++){
+        if (message[i] == ' ' && message[0] != '"'){
+            printf("Invalid Input\n");
+            return;
+        }
+    }
+    scanf("-file ");
+    char folder[50];
+    scanf("%s", folder);
+    char *folder2 = (char*)malloc(50); 
+    char *folder1 = strtok(folder, "/");
+    while (folder1 != NULL){
+        chdir(folder1);
+        counter++;
+        folder2 = folder1;
+        folder1 = strtok(NULL, "/");
+    }
+
+    if (message[0] == '"'){ //This part is to shift all the characters back one place
+        message[strlen(message)-1] = '\0';
+        for (int i = 0; i < strlen(message); i++){
+            message[i] = message[i+1];
+        }
+    }
+    int counter3 = 0; //This is to check for *
+    for (int i = 0; i < strlen(message); i++){
+        if (message[i] == '\\'){
+            counter3++;
+            if (message[i+1] == '*' && counter3 == 1){
+                for (int j = i; j < strlen(message); j++){
+                    message[j] = message[j+1];
+                }
+                counter3 = 0;
+            }
+        }
+    }
+    
+    for (int i = 0; i < strlen(message); i++){
+        if (message[i] == '*'){
+            message[i] = '\0';
+        }
+    }
+    if (message[0] == '*'){ //This is to get the string we are looking for if the '*' is in the beginning
+        for (int i = 0; i < strlen(message); i++){
+            message[i] = message[i+1];
+        }
+    }
+
+    char infoFile[10000];
+    if ((fptr = fopen(folder2, "rb")) == NULL){                //This part is made to see what is inside the file
+        printf("File does not exist\n");
+        for (int i = counter; i > 1; i--){
+            chdir("..");
+        }
+        return;    
+    } else {
+        char ch2; //This copies the data inside the file
+        int i = 0;
+        ch2 = fgetc(fptr);
+        infoFile[0] = ch2;
+        while(ch2 != EOF){
+            i++;
+            ch2 = fgetc(fptr);
+            infoFile[i] = ch2;
+        }
+        infoFile[i+1] = '\0';
+    }
+    fclose(fptr);
+    char c3 = getchar();
+    if (c3 == '\n'){ 
+    char *pos = strstr(infoFile, message);
+    int line = 1;
+    if (pos){ //This is to check which line my position is located
+        for (int i = 0; i < (pos-infoFile); i++){
+            if (infoFile[i] == '\n'){
+                line++;
+            }
+        }
+        int flag1 = 1;
+        int place = 0;
+        for (int i = 0; i < (pos-infoFile); i++){ //This is to find the position of the line we are trying to get to
+            if (infoFile[i] == '\n'){
+                flag1++;
+            }
+            if (flag1 == line){
+                place = i;
+                break;
+            }
+        }
+        if (line == 1){ //This is done to prevent the addition of an extra line because line one is an exception
+            place -= 1;
+        }
+        int cursor = (pos-infoFile)-place-1; //This is where the absolute position is printed
+        printf("%d:%d\n", line, cursor);
+        for (int i = counter; i > 1; i--){
+            chdir("..");
+        }
+        return;
+    } else {
+        printf("-1\n");
+        for (int i = counter; i > 1; i--){
+            chdir("..");
+        }
+        return;
+    }
+    } else if ( c3 == ' '){
+        scanf("-");
+        char options[50];
+        gets(options);
+        for (int i = 0; i < strlen(options); i++){
+            if (options[i] == ' '){
+                for (int j = i; j < strlen(options); j++){
+                    options[j] = options[j+1];
+                }
+            }
+        }
+        if (!strcmp(options, "count")){
+            countstr(message, infoFile);
+        } else if ((!strcmp(options, "all-byword")) || (!strcmp(options, "byword-all"))){
+            allstr(message, infoFile);
+            for (int i = counter; i > 1; i--){
+                chdir("..");
+            } 
+            } else if (!strcmp(options, "byword")){
+                bywordstr(message, infoFile);
+                for (int i = counter; i > 1; i--){
+                    chdir("..");
+                } 
+        } else if (!strcmp(options, "all-byword-count") || !strcmp(options, "byword-all-count") || !strcmp(options, "byword-count-all") || !strcmp(options, "all-count-byword") || !strcmp(options, "count-byword-all") || !strcmp(options, "count-all-byword")){
+                countstr(message, infoFile);
+                allstr(message, infoFile);
+        }else if (!strcmp(options, "count-byword") || !strcmp(options, "byword-count")) {
+            printf("%s\n", options);
+            countstr(message, infoFile);
+            bywordstr(message, infoFile);
+        } else if (!strstr("at", options)){
+            if (strstr(options, "-all")){
+                printf("Invalid command\n");
+                return;
+            }
+            if (strstr(options, "-byword")){
+                int index;
+                int index1;
+                for (int i = 0; i < strlen(options); i++){ //All of this until next 'else' is used to extract the number from the at option
+                    if (options[i] == 'a' && options[i+1] == 't'){
+                        index = i+2; 
+                        break;         
+                    }
+                }
+                int flag = 0;
+                for (int i = index; i < strlen(options); i++){
+                    if (options[i] >= 49 && options[i] <= 57){
+                        flag++;
+                    }
+                }
+                int num = 0; 
+                int power = flag-1;
+                for (int i = index; i < index+flag; i++){
+                    num += (options[i]-48)*pow(10, power);
+                    power--;
+                }
+                if (strstr(options, "-count")){
+                    countstr(message, infoFile);
+                }
+                atbywordstr(message, infoFile, num);
+            } else {
+                int index;
+                int index1;
+                for (int i = 0; i < strlen(options); i++){ //All of this until next 'else' is used to extract the number from the at option
+                    if (options[i] == 'a' && options[i+1] == 't'){
+                        index = i+2; 
+                        break;         
+                    }
+                }
+                int flag = 0;
+                for (int i = index; i < strlen(options); i++){
+                    if (options[i] >= 49 && options[i] <= 57){
+                        flag++;
+                    }
+                }
+                int num = 0; 
+                int power = flag-1;
+                for (int i = index; i < index+flag; i++){
+                    num += (options[i]-48)*pow(10, power);
+                    power--;
+                }
+                if (strstr(options, "-count")){
+                    countstr(message, infoFile);
+                }
+                atstr(message, infoFile, num);
+            }
+        } else {
+            char c; //All of this is made in order to print only one "invalid command"
+            scanf("%c", &c);
+            if (c == '\n'){
+                goto x;
+            }
+            while(c!='\n')
+                scanf("%c", &c);
+            x:
+            printf("Invalid command\n");
+            c=0;
+        }
+    }
+}
+
+
+
+int main(){
+    char dastor [30];
+    char file[] = "besaz--file";
+    char cat[] = "bekhun--file";
+    char exit[] = "exit";
+    char insert[] = "berizstr--file";
+    char remove[] = "hazfstr--file";
+    char copy[] = "copystr--file";
+    char cut[] = "beborstr--file";
+    char paste[] = "bechasbunstr--file";
+    char find[] = "begard--str";
+    int counter1 = 0; //This counter is used to get out of dir in cat
+    FILE * fptr;
+    while(1){
+    z:
+    scanf("%s", dastor);   
+    if(!strcmp(dastor, file)){
+            createfile();
+        } else if (!strcmp(dastor, exit)){
+            break;
+        } else if (!strcmp(dastor, cat)){
+            catfile();   
+        } else if (!strcmp(dastor, insert)){
+                int counter11 = 0;
+                int counter3 = 0; //This counter is used to get out of dir in insert
+                char folder[50];
+                scanf("%s", folder);
+                char *folder2 = (char*)malloc(50); 
+                char *folder1 = strtok(folder, "/");
+                while (folder1 != NULL){
+                    chdir(folder1);
+                    counter3++;
+                    counter11++;
+                    folder2 = folder1;
+                    folder1 = strtok(NULL, "/");
+                }
+                scanf(" --str");
+                char c1;
+                char *message = (char*)malloc(100*sizeof(char));
+                c1 = getchar();
+                message[0] = c1; //This is to get the string that we want to insert
+                int counter2 = 1; //This counter is used to get command
+                while(1){
+                    c1 = 0;
+                    c1 = getchar();
+                    *(message+counter2) = c1;
+                    counter2++;
+                    if( c1 == '-'){
+                        break;
+                    }
+                }
+                scanf("-pos ");
+                int line;
+                int pos;
+                scanf("%d:%d", &line, &pos);
+                message[counter2] = '\0'; //This is to ignore the '-' and ' ' at the end of the message
+                message[counter2-1] = '\0';
+                for (int i = 0; i < strlen(message); i++){
+                    if (message[i] == ' ' && message[0] != '"'){
+                        printf("Invalid Input\n");
+                        goto z;
+                    }
+                }
+                for (int i = 1; i < strlen(message); i++){
+                    if (message[i] == '\\'){
+                        if (message[i+1]  == '"'){
+                            message[i] = '"';
+                            for(int j = i; j < strlen(message); j++){
+                                message[j] = message[j+1];
+                            }
+                        }
+                    }
+                }
+                if (message[0] == '"'){ //This part is to shift all the characters back one place
+                    message[strlen(message)-1] = '\0';
+                    for (int i = 0; i < strlen(message); i++){
+                        message[i] = message[i+1];
+                    }
+                }
+                char c2;
+                int counter4 = 0; //This counter is used to check for \n
+                fptr = fopen(folder2, "r"); //This part is made to see what is inside the file
+                char ch2;
+                char *infoFile = (char *)malloc(10000*sizeof(char));
+                int i = 0;
+                ch2 = fgetc(fptr);
+                infoFile[0] = ch2;
+                while(ch2 != EOF){
+                    i++;
+                    ch2 = fgetc(fptr);
+                    infoFile[i] = ch2;
+                }
+                infoFile[i+1] = '\0';
+                fclose(fptr);
+                fptr = fopen(folder2, "r+");
+                if (fptr == NULL){ //This checks if the file exists
+                        printf("File does not exist\n");
+                        for (int i = counter3; i > 1; i--){
+                            chdir("..");
+                        }
+                        counter3 = 0;
+                        goto z;
+                } else {  
+                    fseek(fptr, 0, SEEK_END);     
+                    int size;
+                    size = ftell(fptr);
+                    if ( size == 0){ //This is used to check if the file empty, then start the command
+                        for (int i = 1; i < line; i++){
+                            fprintf(fptr, "\n");
+                        }
+                        for (int i = 0; i < pos; i++){
+                            fprintf(fptr, " ");
+                        }
+                        for(int i = 0; i < strlen(message); i++){ //Here we are checking for \n and \\n
+                            if (message[i] == '\\'){
+                                counter4++;
+                                if (message[i+1] == 'n' && counter4 == 1){
+                                    fprintf(fptr, "\n");
+                                    i++;
+                                    counter4 = 0;
+                                }
+                                fprintf(fptr, "%c", message[i+1]);
+                                i++;
+                            } else {
+                                fprintf(fptr, "%c", message[i]);
+                            }
+                        }
+                    } else {
+                        int flag = 1; //This is to see how many \n are in the file
+                        for (int i = 0; i < strlen(infoFile); i++){
+                            if (infoFile[i] == '\n'){
+                                flag++;
+                            }
+                        }
+                        if (flag < line){ //This part checkes if the given position is below everything already in the file
+                            int diff = line - flag;
+                            for (int i = 1; i <= diff; i++){
+                                fprintf(fptr, "\n");
+                            }
+                            for (int i = 0; i < pos; i++){
+                                fprintf(fptr, " ");
+                            }
+                            int counter5 = 0; //This counter is used for \n and \\n
+                            for(int i = 0; i < strlen(message); i++){ //Here we are checking for \n and \\n
+                            if (message[i] == '\\'){
+                                counter5++;
+                                if (message[i+1] == 'n' && counter5 == 1){
+                                    fprintf(fptr, "\n");
+                                    i++;
+                                    counter5 = 0;
+                                }
+                                fprintf(fptr, "%c", message[i+1]);
+                                i++;
+                            } else {
+                                fprintf(fptr, "%c", message[i]);
+                            }
+                            }
+                        } else {
+                            int flag1 = 1;
+                            int place;
+                            for (int i = 0; i < strlen(infoFile); i++){ //This is to find the position of the line we are trying to get to
+                                if (infoFile[i] == '\n'){
+                                    flag1++;
+                                }
+                                if (flag1 == line){
+                                    place = i;
+                                    break;
+                                }
+                            }
+                            if (line == 1){ //This one is done to make sure that if the line is one, it is not added up to the position
+                                line = 0;
+                            }
+                            fseek(fptr, place+pos+line, SEEK_SET);
+                            int counter6 = 0; //This coutner is used to check for \n and \\n
+                            for(int i = 0; i < strlen(message); i++){ //Here we are checking for \n and \\n
+                            if (message[i] == '\\'){
+                                counter6++;
+                                if (message[i+1] == 'n' && counter6 == 1){
+                                    fputs("\n", fptr);
+                                    i++;
+                                    counter6 = 0;
+                                }
+                                fprintf(fptr, "%c", message[i+1]);
+                                i++;
+                            } else {
+                                fprintf(fptr, "%c", message[i]);
+                            }
+                            }
+                            for (int i = line+pos+place-line+1; i < strlen(infoFile)-1; i++){
+                                fprintf(fptr, "%c", infoFile[i]);
+                            }              
+                        }
+                    }
+                    fclose(fptr);
+                    for (int i = counter3; i > 1; i--){
+                        chdir("..");
+                    }
+                    counter3 = 0;
+                }  
+        } else if (!strcmp(dastor, remove)){
+            removestr();
+        } else if (!strcmp(dastor, copy)){
+            copystr();
+        } else if (!strcmp(dastor, cut)){
+            cutstr();
+        } else if (!strcmp(dastor, paste)){
+            pastestr();
+        } else if (!strcmp(dastor, find)){
+            findstr();
+        } else {       
+            char c; //All of this is made in order to print only one "invalid command"
+            scanf("%c", &c);
+            if (c == '\n'){
+                goto x;
+            }
+            while(c!='\n')
+                scanf("%c", &c);
+            x:
+            printf("Invalid command\n");
+            c=0;
+        }
+    }
+}
