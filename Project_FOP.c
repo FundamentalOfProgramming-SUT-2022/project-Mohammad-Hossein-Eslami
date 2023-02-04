@@ -72,7 +72,7 @@ void createfile(){ //bekhun--file <address>
             chdir("..");
         }
         counter = 0;
-        print_cwd();
+        
         
         for (int i = 0; i < strlen(foldersaver1); i++){
             if (foldersaver1[i] == '/'){
@@ -83,7 +83,7 @@ void createfile(){ //bekhun--file <address>
                 break;
             }
         }
-        printf("%s\n", foldersaver1);
+        
         //foldersaver1[strlen(foldersaver1)-1] = '\0';
         char *folder4 = (char*)malloc(50); 
         char *folder3 = strtok(foldersaver1, "/");
@@ -101,7 +101,7 @@ void createfile(){ //bekhun--file <address>
         for (int i = counter; i > 1; i--){
             chdir("..");
         }
-        print_cwd();
+       
         counter = 0;
 
     } else if ( c == '"'){
@@ -148,7 +148,7 @@ void createfile(){ //bekhun--file <address>
             chdir("..");
         }
         counter = 0;
-        print_cwd();
+        
 
         for (int i = 0 ; i < strlen(foldersaver1); i++){
             foldersaver1[i] = foldersaver1[i+1];
@@ -184,7 +184,7 @@ void createfile(){ //bekhun--file <address>
             chdir("..");
         }
         counter = 0;
-        print_cwd();
+        
     }
 }
 
@@ -202,31 +202,30 @@ void firstundo(char * infoFile, char *backfolder, char *backfolder1, int length)
     }
     
 
-    print_cwd();
+    
     
     char *folder2 = (char*)malloc(50); 
     char *folder1 = strtok(backfolder, "/");
     while (folder1 != NULL){
         chdir(folder1);
-        printf("%s\n", folder1);
         counter++;
         folder2 = folder1;
         folder1 = strtok(NULL, "/");
     }
     
-    print_cwd();
+    
     infoFile[strlen(infoFile)] = '\0';
     fptr = fopen(folder2, "wb");
     fputs(infoFile, fptr);
     fclose(fptr);
 
-    print_cwd();
+    
     for(int i = counter; i > 1; i--){
         chdir("..");
     }
     counter = 0;
 
-    print_cwd();
+    
     char *folder3 = strtok(backfolder1, "/");
     while (folder3 != NULL){
         chdir(folder3);
@@ -349,6 +348,10 @@ void removestr(){ //hazfstr--file <address> --poax:y--sizenumb-b/or/f
     int length = strlen(folder);
     char backfolder [50];
     char backfolder1 [50];
+    for (int i = 0; i < strlen(folder); i++){
+        backfolder1[i] = '\0';
+        backfolder[i] = '\0';
+    }
     for (int i = 0; i < strlen(folder); i++){
         backfolder[i] = folder[i];
         backfolder1[i] = folder[i];
@@ -701,6 +704,10 @@ void pastestr(){ //bechasbunstr--file <address> --posx:y
     int length = strlen(folder);
     char backfolder [50];
     char backfolder1 [50];
+    for (int i = 0; i < length; i++){
+        backfolder1[i] = '\0';
+        backfolder[i] = '\0';
+    }
     for (int i = 0; i < strlen(folder); i++){
         backfolder[i] = folder[i];
         backfolder1[i] = folder[i];
@@ -750,6 +757,10 @@ void pastestr(){ //bechasbunstr--file <address> --posx:y
     for (int i = counter; i > 1; i--){
         chdir("..");
     }
+
+    printf("%s\n", backfolder1);
+    printf("%s\n", backfolder);
+    print_cwd();
 
     firstundo(infoFile, backfolder, backfolder1, length);
 
@@ -2853,6 +2864,10 @@ void replacestr(){
     char backfolder [50];
     char backfolder1 [50];
     for (int i = 0; i < strlen(folder); i++){
+        backfolder1[i] = '\0';
+        backfolder[i] = '\0';
+    }
+    for (int i = 0; i < strlen(folder); i++){
         backfolder[i] = folder[i];
         backfolder1[i] = folder[i];
     }
@@ -3498,6 +3513,10 @@ int main(){
                 char backfolder [50];
                 char backfolder1 [50];
                 for (int i = 0; i < strlen(folder); i++){
+                    backfolder1[i] = '\0';
+                    backfolder[i] = '\0';
+                }
+                for (int i = 0; i < strlen(folder); i++){
                 backfolder[i] = folder[i];
                 backfolder1[i] = folder[i];
                 }
@@ -3573,6 +3592,7 @@ int main(){
                         }
                     }
                 }
+
                 if (message[0] == '"'){ //This part is to shift all the characters back one place
                     message[strlen(message)-1] = '\0';
                     for (int i = 0; i < strlen(message); i++){
@@ -3596,11 +3616,12 @@ int main(){
                 infoFile[i+1] = '\0';
                 fclose(fptr);
                 
-                for (int i = counter3; i > 1; i--){
+                for (int i = counter11; i > 1; i--){
                     chdir("..");
                 }
 
-
+                
+                
                 firstundo(infoFile, backfolder, backfolder1, length);
 
                 fptr = fopen(folder2, "r+");
